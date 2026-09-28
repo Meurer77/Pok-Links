@@ -1,0 +1,2760 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PokéLinks</title>
+
+<style>
+@font-face{
+    font-family:Pokemon;
+    src:url("Pokemon Solid.ttf") format("truetype");
+}
+
+*{box-sizing:border-box}
+
+:root{
+    --bg:#eef3f9;
+    --bg2:#dfe8f4;
+    --card:#fff;
+    --text:#182235;
+    --muted:#69758a;
+    --blue:#2874d8;
+    --blue-dark:#174b99;
+    --yellow:#ffcb05;
+    --red:#e53935;
+    --green:#25a866;
+    --border:#d6dfeb;
+    --shadow:0 14px 35px rgba(25,55,95,.12);
+}
+
+body.dark{
+    --bg:#070d18;
+    --bg2:#0d1728;
+    --card:#111c2d;
+    --text:#f4f7ff;
+    --muted:#9aa8bc;
+    --blue:#3c82ed;
+    --blue-dark:#1d5db6;
+    --border:#263752;
+    --shadow:0 18px 45px rgba(0,0,0,.35);
+}
+
+body{
+    margin:0;
+    min-height:100vh;
+    color:var(--text);
+    font-family:Arial,Helvetica,sans-serif;
+    background:
+        radial-gradient(circle at 15% 10%,rgba(255,203,5,.10),transparent 25%),
+        radial-gradient(circle at 85% 20%,rgba(40,116,216,.12),transparent 30%),
+        linear-gradient(135deg,var(--bg),var(--bg2));
+    overflow-x:hidden;
+    transition:background .35s ease,color .35s ease;
+}
+
+button{font-family:inherit;cursor:pointer}
+
+.hidden{display:none!important}
+
+/* ================= FUNDO ================= */
+
+.bg-pokeball{
+    position:fixed;
+    width:500px;
+    height:500px;
+    border:2px solid rgba(255,255,255,.07);
+    border-radius:50%;
+    right:-220px;
+    top:-170px;
+    pointer-events:none;
+    animation:floatBall 9s ease-in-out infinite;
+}
+
+.bg-pokeball::before{
+    content:"";
+    position:absolute;
+    left:0;
+    right:0;
+    top:48%;
+    height:4px;
+    background:rgba(255,255,255,.07);
+}
+
+.bg-pokeball::after{
+    content:"";
+    position:absolute;
+    width:80px;
+    height:80px;
+    border:4px solid rgba(255,255,255,.07);
+    border-radius:50%;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+}
+
+@keyframes floatBall{
+    0%,100%{transform:rotate(0) translateY(0)}
+    50%{transform:rotate(8deg) translateY(20px)}
+}
+
+/* ================= MENU ================= */
+
+#menu{
+    min-height:100vh;
+    position:relative;
+    padding:35px 18px 45px;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+}
+
+.menu-container{
+    width:min(1000px,100%);
+    position:relative;
+    z-index:2;
+}
+
+.hero{
+    text-align:center;
+    animation:fadeDown .7s ease both;
+}
+
+@keyframes fadeDown{
+    from{opacity:0;transform:translateY(-20px)}
+    to{opacity:1;transform:translateY(0)}
+}
+
+.pokeball{
+    width:86px;
+    height:86px;
+    border:6px solid var(--text);
+    border-radius:50%;
+    margin:0 auto 12px;
+    position:relative;
+    background:linear-gradient(
+        to bottom,
+        var(--red) 0 44%,
+        var(--text) 44% 56%,
+        #f7f7f7 56% 100%
+    );
+    box-shadow:0 10px 25px rgba(0,0,0,.18);
+    animation:pokeballFloat 3.5s ease-in-out infinite;
+}
+
+.pokeball::after{
+    content:"";
+    position:absolute;
+    width:27px;
+    height:27px;
+    border:6px solid var(--text);
+    border-radius:50%;
+    background:var(--card);
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+}
+
+@keyframes pokeballFloat{
+    0%,100%{transform:translateY(0) rotate(-2deg)}
+    50%{transform:translateY(-8px) rotate(2deg)}
+}
+
+.logo{
+    margin:0;
+    font-family:Pokemon,Impact,sans-serif;
+    font-size:clamp(60px,10vw,105px);
+    letter-spacing:3px;
+    line-height:.9;
+    color:var(--yellow);
+    -webkit-text-stroke:3px #2864a6;
+    text-shadow:4px 4px 0 #173b6d,0 8px 22px rgba(0,0,0,.2);
+}
+
+.subtitle{
+    margin:12px 0 28px;
+    color:var(--muted);
+    font-size:16px;
+}
+
+.how-to,
+.options,
+.difficulty-box{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:20px;
+    box-shadow:var(--shadow);
+    margin-bottom:18px;
+    animation:fadeUp .7s ease both;
+}
+
+.options{animation-delay:.08s}
+.difficulty-box{animation-delay:.16s}
+
+@keyframes fadeUp{
+    from{opacity:0;transform:translateY(18px)}
+    to{opacity:1;transform:translateY(0)}
+}
+
+.section-title{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    margin:0 0 15px;
+    font-size:18px;
+    font-weight:900;
+}
+
+.ball-icon{
+    width:28px;
+    height:28px;
+    border-radius:50%;
+    border:2px solid var(--text);
+    background:linear-gradient(
+        to bottom,
+        var(--red) 0 44%,
+        var(--text) 44% 56%,
+        white 56%
+    );
+    position:relative;
+}
+
+.ball-icon::after{
+    content:"";
+    position:absolute;
+    width:8px;
+    height:8px;
+    border:2px solid var(--text);
+    border-radius:50%;
+    background:white;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+}
+
+.rules{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+}
+
+.rule{
+    background:var(--bg);
+    border:1px solid var(--border);
+    border-radius:13px;
+    padding:14px;
+    transition:.25s ease;
+}
+
+.rule:hover{
+    transform:translateY(-4px);
+    border-color:var(--blue);
+}
+
+.rule-number{
+    display:inline-flex;
+    width:27px;
+    height:27px;
+    border-radius:50%;
+    align-items:center;
+    justify-content:center;
+    background:var(--blue);
+    color:white;
+    font-size:12px;
+    font-weight:900;
+    margin-bottom:8px;
+}
+
+.rule strong{
+    display:block;
+    margin-bottom:4px;
+}
+
+.rule span{
+    color:var(--muted);
+    font-size:12px;
+    line-height:1.45;
+}
+
+.option-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+}
+
+.option{
+    min-height:82px;
+    background:var(--bg);
+    border:2px solid var(--border);
+    border-radius:13px;
+    padding:11px;
+    transition:.2s;
+}
+
+.option:hover{
+    border-color:var(--blue);
+    transform:translateY(-2px);
+}
+
+.option label{
+    display:block;
+    font-size:12px;
+    font-weight:800;
+    margin-bottom:8px;
+}
+
+.option select{
+    width:100%;
+    padding:7px;
+    border-radius:7px;
+    border:1px solid var(--border);
+    background:var(--card);
+    color:var(--text);
+}
+
+.switch{
+    display:flex!important;
+    align-items:center;
+    gap:8px;
+    font-size:12px!important;
+    color:var(--muted);
+    cursor:pointer;
+}
+
+.switch input{
+    width:17px;
+    height:17px;
+    accent-color:var(--blue);
+}
+
+.warning{
+    margin-top:12px;
+    font-size:11px;
+    color:var(--muted);
+}
+
+.difficulty-title{
+    text-align:center;
+    margin:0 0 13px;
+    font-size:14px;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:1px;
+    font-weight:900;
+}
+
+.difficulty{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+}
+
+.diff-btn{
+    border:2px solid var(--border);
+    background:var(--card);
+    color:var(--text);
+    border-radius:13px;
+    padding:14px 8px;
+    font-weight:900;
+    transition:.2s ease;
+    position:relative;
+    overflow:hidden;
+}
+
+.diff-btn:hover:not(:disabled){
+    transform:translateY(-3px);
+    border-color:var(--blue);
+}
+
+.diff-btn.selected{
+    background:var(--blue);
+    color:white;
+    border-color:var(--blue);
+    box-shadow:0 8px 20px rgba(40,116,216,.22);
+}
+
+.diff-btn.completed{
+    background:var(--green);
+    color:white;
+    border-color:var(--green);
+}
+
+.diff-btn.failed{
+    background:#687386;
+    color:white;
+    border-color:#687386;
+}
+
+.diff-btn:disabled{
+    opacity:.7;
+    cursor:not-allowed;
+}
+
+.start-btn{
+    width:100%;
+    margin-top:12px;
+    border:0;
+    border-radius:14px;
+    padding:17px;
+    background:linear-gradient(135deg,#ffdc27,#ffbd00);
+    color:#182235;
+    font-size:19px;
+    font-weight:1000;
+    letter-spacing:.5px;
+    box-shadow:0 8px 0 #d39d00,0 15px 25px rgba(255,203,5,.2);
+    transition:.15s ease;
+}
+
+.start-btn:hover:not(:disabled){
+    transform:translateY(-3px);
+    box-shadow:0 11px 0 #d39d00,0 18px 28px rgba(255,203,5,.25);
+}
+
+.start-btn:active:not(:disabled){
+    transform:translateY(4px);
+    box-shadow:0 3px 0 #d39d00;
+}
+
+.start-btn:disabled{
+    opacity:.55;
+    cursor:not-allowed;
+    box-shadow:none;
+}
+
+.daily-info{
+    text-align:center;
+    margin-top:13px;
+    color:var(--muted);
+    font-size:12px;
+    line-height:1.7;
+}
+
+.countdown{
+    color:var(--blue);
+    font-weight:900;
+}
+
+.contact{
+    text-align:center;
+    margin-top:20px;
+    color:var(--muted);
+    font-size:10px;
+}
+
+.contact a{
+    color:inherit;
+    text-decoration:none;
+}
+
+.contact a:hover{color:var(--blue)}
+
+/* ================= JOGO ================= */
+
+#game{
+    min-height:100vh;
+    padding:18px 14px 35px;
+}
+
+.game-container{
+    width:min(1050px,100%);
+    margin:auto;
+}
+
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    margin-bottom:16px;
+}
+
+.small-logo{
+    font-family:Pokemon,Impact,sans-serif;
+    color:var(--yellow);
+    -webkit-text-stroke:1.5px #2460a8;
+    text-shadow:2px 2px 0 #173b6d;
+    font-size:30px;
+}
+
+.top-actions{
+    display:flex;
+    gap:7px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+}
+
+.top-btn{
+    border:1px solid var(--border);
+    background:var(--card);
+    color:var(--text);
+    border-radius:9px;
+    padding:8px 11px;
+    font-size:12px;
+    transition:.18s;
+}
+
+.top-btn:hover{
+    transform:translateY(-2px);
+    border-color:var(--blue);
+}
+
+.info-bar{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:12px 15px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    margin-bottom:14px;
+    box-shadow:var(--shadow);
+}
+
+.info-left{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+}
+
+.info-item{
+    font-size:13px;
+    color:var(--muted);
+}
+
+.info-item strong{color:var(--text)}
+#mistakes{color:#e04b52}
+#timer{color:var(--blue);font-weight:800}
+
+.board{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+}
+
+.pokemon-card{
+    position:relative;
+    border:2px solid var(--border);
+    background:var(--card);
+    color:var(--text);
+    border-radius:14px;
+    min-height:155px;
+    padding:10px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    transition:transform .18s ease,border-color .18s ease,background .18s ease,box-shadow .18s ease;
+    box-shadow:var(--shadow);
+    user-select:none;
+    overflow:hidden;
+}
+
+.pokemon-card:hover{
+    transform:translateY(-5px) scale(1.015);
+    border-color:var(--blue);
+    box-shadow:0 14px 30px rgba(40,116,216,.16);
+}
+
+.pokemon-card.selected{
+    border-color:var(--blue);
+    background:rgba(40,116,216,.12);
+    box-shadow:0 12px 28px rgba(40,116,216,.18);
+}
+
+/* APENAS O QUADRADO CLICADO */
+.pokemon-card.clicked-animation{
+    animation:cardClick .32s cubic-bezier(.2,.8,.2,1);
+}
+
+@keyframes cardClick{
+    0%{transform:scale(1)}
+    35%{transform:scale(.92) rotate(-1deg)}
+    70%{transform:scale(1.045) rotate(1deg)}
+    100%{transform:scale(1)}
+}
+
+.pokemon-card img{
+    width:105px;
+    height:105px;
+    object-fit:contain;
+    transition:transform .2s ease;
+}
+
+.pokemon-card:hover img{
+    transform:scale(1.07);
+}
+
+.pokemon-name{
+    font-weight:900;
+    font-size:14px;
+    margin-top:2px;
+    text-align:center;
+}
+
+.pokemon-number{
+    color:var(--muted);
+    font-size:10px;
+    margin-top:2px;
+}
+
+.type-list{
+    display:flex;
+    gap:4px;
+    margin-top:5px;
+    justify-content:center;
+    flex-wrap:wrap;
+}
+
+.type{
+    border-radius:5px;
+    padding:3px 6px;
+    color:white;
+    font-size:9px;
+    font-weight:800;
+    text-transform:uppercase;
+}
+
+.type-normal{background:#8d8d73}
+.type-fire{background:#e85d04}
+.type-water{background:#3b82f6}
+.type-electric{background:#d9a900}
+.type-grass{background:#4caf50}
+.type-ice{background:#48a9a6}
+.type-fighting{background:#b52a2a}
+.type-poison{background:#9146a3}
+.type-ground{background:#b08b4f}
+.type-flying{background:#7189c9}
+.type-psychic{background:#e05287}
+.type-bug{background:#719c27}
+.type-rock{background:#8b7651}
+.type-ghost{background:#5c4a8e}
+.type-dragon{background:#5b42c4}
+.type-dark{background:#40362f}
+.type-steel{background:#737b87}
+.type-fairy{background:#d889b4}
+
+.controls{
+    display:flex;
+    justify-content:center;
+    gap:9px;
+    flex-wrap:wrap;
+    margin:16px 0;
+}
+
+.control-btn{
+    border:0;
+    border-radius:10px;
+    padding:11px 17px;
+    font-weight:800;
+    background:var(--blue);
+    color:white;
+    transition:.18s;
+}
+
+.control-btn:hover{
+    transform:translateY(-2px);
+    filter:brightness(1.08);
+}
+
+.control-btn.secondary{
+    background:var(--card);
+    color:var(--text);
+    border:1px solid var(--border);
+}
+
+.hint-box{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:11px 14px;
+    text-align:center;
+    color:var(--muted);
+    font-size:13px;
+    margin-bottom:15px;
+}
+
+/* PISCAR DICA */
+#hintButton.hint-attention{
+    animation:hintAttention .8s ease-in-out infinite;
+}
+
+@keyframes hintAttention{
+    0%,100%{
+        transform:scale(1);
+        box-shadow:0 0 0 0 rgba(255,203,5,0);
+    }
+    50%{
+        transform:scale(1.08);
+        box-shadow:0 0 0 7px rgba(255,203,5,.28);
+        background:var(--yellow);
+        color:#182235;
+    }
+}
+
+.solved{
+    display:grid;
+    gap:9px;
+    margin-top:8px;
+}
+
+.solved-group{
+    border-radius:12px;
+    padding:12px 15px;
+    background:var(--card);
+    border:1px solid var(--border);
+    box-shadow:var(--shadow);
+    animation:solvedAppear .35s ease both;
+}
+
+@keyframes solvedAppear{
+    from{opacity:0;transform:translateX(-12px)}
+    to{opacity:1;transform:translateX(0)}
+}
+
+.solved-title{
+    font-weight:900;
+    margin-bottom:3px;
+}
+
+.solved-pokemon{
+    color:var(--muted);
+    font-size:12px;
+}
+
+/* ================= JANELA DO GRUPO ================= */
+
+.group-modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.7);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+    z-index:1200;
+    animation:modalBg .2s ease both;
+}
+
+.group-window{
+    width:min(700px,100%);
+    max-height:90vh;
+    overflow:auto;
+    background:var(--card);
+    color:var(--text);
+    border:2px solid var(--border);
+    border-radius:22px;
+    padding:24px;
+    box-shadow:0 25px 80px rgba(0,0,0,.4);
+    animation:groupWindowIn .3s cubic-bezier(.2,.8,.2,1) both;
+}
+
+@keyframes groupWindowIn{
+    from{
+        opacity:0;
+        transform:translateY(25px) scale(.92);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0) scale(1);
+    }
+}
+
+@keyframes modalBg{
+    from{opacity:0}
+    to{opacity:1}
+}
+
+.group-header{
+    text-align:center;
+    margin-bottom:18px;
+}
+
+.group-check{
+    width:58px;
+    height:58px;
+    margin:0 auto 10px;
+    border-radius:50%;
+    background:var(--green);
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:30px;
+    font-weight:900;
+    animation:checkPop .4s .1s ease both;
+}
+
+@keyframes checkPop{
+    from{transform:scale(0)}
+    70%{transform:scale(1.12)}
+    to{transform:scale(1)}
+}
+
+.group-header h2{
+    margin:0 0 6px;
+    font-size:23px;
+}
+
+.group-header p{
+    margin:0;
+    color:var(--muted);
+    font-size:13px;
+}
+
+.group-pokemon-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+    margin:18px 0;
+}
+
+.group-pokemon{
+    background:var(--bg);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:10px;
+    text-align:center;
+    animation:groupPokemonIn .35s ease both;
+}
+
+@keyframes groupPokemonIn{
+    from{
+        opacity:0;
+        transform:translateY(15px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+.group-pokemon img{
+    width:110px;
+    height:110px;
+    object-fit:contain;
+}
+
+.group-pokemon-name{
+    font-size:13px;
+    font-weight:900;
+}
+
+.group-pokemon-number{
+    color:var(--muted);
+    font-size:10px;
+}
+
+.group-continue{
+    width:100%;
+    border:0;
+    border-radius:12px;
+    padding:13px;
+    background:var(--blue);
+    color:white;
+    font-weight:900;
+    font-size:14px;
+    transition:.18s;
+}
+
+.group-continue:hover{
+    transform:translateY(-2px);
+}
+
+/* ================= FIM DE JOGO ================= */
+
+.result-modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.72);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+    z-index:1300;
+}
+
+.result-window{
+    width:min(480px,100%);
+    background:var(--card);
+    border-radius:22px;
+    padding:25px;
+    text-align:center;
+    box-shadow:0 25px 80px rgba(0,0,0,.45);
+    animation:groupWindowIn .3s ease both;
+}
+
+.result-icon{
+    font-size:50px;
+    margin-bottom:8px;
+}
+
+.result-window h2{
+    margin:0 0 8px;
+}
+
+.result-window p{
+    color:var(--muted);
+    font-size:14px;
+    line-height:1.5;
+}
+
+.result-button{
+    width:100%;
+    border:0;
+    border-radius:12px;
+    padding:13px;
+    background:var(--blue);
+    color:white;
+    font-weight:900;
+    margin-top:10px;
+}
+
+/* ================= MENSAGEM ================= */
+
+.message{
+    position:fixed;
+    left:50%;
+    bottom:22px;
+    transform:translateX(-50%) translateY(20px);
+    background:#111827;
+    color:white;
+    padding:11px 17px;
+    border-radius:10px;
+    font-size:13px;
+    opacity:0;
+    pointer-events:none;
+    transition:.2s;
+    z-index:2000;
+}
+
+.message.show{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+}
+
+/* ================= RESPONSIVO ================= */
+
+@media(max-width:760px){
+
+    .rules{
+        grid-template-columns:1fr;
+    }
+
+    .option-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .difficulty{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .board{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .group-pokemon-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+}
+
+@media(max-width:480px){
+
+    #menu{
+        padding:24px 12px 35px;
+    }
+
+    .logo{
+        font-size:60px;
+    }
+
+    .pokeball{
+        width:72px;
+        height:72px;
+    }
+
+    .option-grid{
+        grid-template-columns:1fr;
+    }
+
+    .pokemon-card{
+        min-height:145px;
+    }
+
+    .pokemon-card img{
+        width:84px;
+        height:84px;
+    }
+
+    .group-pokemon img{
+        width:85px;
+        height:85px;
+    }
+
+    .topbar{
+        align-items:flex-start;
+    }
+}
+</style>
+</head>
+
+<body class="dark">
+
+<div class="bg-pokeball"></div>
+
+<!-- ================= MENU ================= -->
+
+<section id="menu">
+<div class="menu-container">
+
+    <div class="hero">
+        <div class="pokeball"></div>
+
+        <h1 class="logo">PokéLinks</h1>
+
+        <p class="subtitle">
+            O desafio diário de conexões Pokémon.
+        </p>
+    </div>
+
+    <div class="how-to">
+
+        <h2 class="section-title">
+            <span class="ball-icon"></span>
+            Como jogar
+        </h2>
+
+        <div class="rules">
+
+            <div class="rule">
+                <span class="rule-number">1</span>
+                <strong>Observe</strong>
+                <span>
+                    Você verá 16 Pokémon misturados no tabuleiro.
+                </span>
+            </div>
+
+            <div class="rule">
+                <span class="rule-number">2</span>
+                <strong>Encontre conexões</strong>
+                <span>
+                    Escolha 4 Pokémon que tenham uma característica em comum.
+                </span>
+            </div>
+
+            <div class="rule">
+                <span class="rule-number">3</span>
+                <strong>Complete os grupos</strong>
+                <span>
+                    Existem 4 grupos. Você tem no máximo 5 erros.
+                </span>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="options">
+
+        <h2 class="section-title">
+            <span class="ball-icon"></span>
+            Opções de jogo
+        </h2>
+
+        <div class="option-grid">
+
+            <div class="option">
+                <label>Modo visual</label>
+
+                <label class="switch">
+                    <input
+                        type="checkbox"
+                        id="darkMode"
+                        checked
+                        onchange="toggleDarkMode()"
+                    >
+                    <span>Modo escuro</span>
+                </label>
+            </div>
+
+            <div class="option">
+                <label>Mostrar tipagem</label>
+
+                <label class="switch">
+                    <input
+                        type="checkbox"
+                        id="showTypes"
+                        onchange="saveHomeSettings()"
+                    >
+                    <span>Exibir tipos</span>
+                </label>
+            </div>
+
+            <div class="option">
+                <label>Número da Pokédex</label>
+
+                <label class="switch">
+                    <input
+                        type="checkbox"
+                        id="showNumbers"
+                        onchange="saveHomeSettings()"
+                    >
+                    <span>Exibir números</span>
+                </label>
+            </div>
+
+            <div class="option">
+                <label>Tempo de jogo</label>
+
+                <select
+                    id="timerDuration"
+                    onchange="saveHomeSettings()"
+                >
+                    <option value="0">Sem limite</option>
+                    <option value="60">1 minuto</option>
+                    <option value="120">2 minutos</option>
+                    <option value="180">3 minutos</option>
+                    <option value="300">5 minutos</option>
+                </select>
+            </div>
+
+        </div>
+
+        <div class="warning">
+            Tipagem, números da Pokédex e tempo maior podem facilitar o desafio.
+        </div>
+
+    </div>
+
+    <div class="difficulty-box">
+
+        <p class="difficulty-title">
+            Escolha a dificuldade
+        </p>
+
+        <div class="difficulty">
+
+            <button
+                class="diff-btn selected"
+                data-difficulty="easy"
+                onclick="selectDifficulty('easy')"
+            >
+                Fácil
+            </button>
+
+            <button
+                class="diff-btn"
+                data-difficulty="medium"
+                onclick="selectDifficulty('medium')"
+            >
+                Médio
+            </button>
+
+            <button
+                class="diff-btn"
+                data-difficulty="hard"
+                onclick="selectDifficulty('hard')"
+            >
+                Difícil
+            </button>
+
+            <button
+                class="diff-btn"
+                data-difficulty="impossible"
+                onclick="selectDifficulty('impossible')"
+            >
+                Impossível
+            </button>
+
+        </div>
+
+        <button
+            class="start-btn"
+            id="startButton"
+            onclick="startGame()"
+        >
+            INICIAR DESAFIO
+        </button>
+
+        <div class="daily-info">
+            <div id="dailyStatus">
+                0/4 dificuldades concluídas hoje.
+            </div>
+
+            <div>
+                Próximos desafios em:
+                <span class="countdown" id="countdown">
+                    --:--:--
+                </span>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="contact">
+        <a href="mailto:joaopedroqmeurer@gmail.com">
+            joaopedroqmeurer@gmail.com
+        </a>
+        ·
+        <a href="https://instagram.com/joaopedromeurer_" target="_blank">
+            @joaopedromeurer_
+        </a>
+        ·
+        <a href="https://tiktok.com/@..meurer" target="_blank">
+            @..meurer
+        </a>
+    </div>
+
+</div>
+</section>
+
+<!-- ================= JOGO ================= -->
+
+<section id="game" class="hidden">
+<div class="game-container">
+
+    <div class="topbar">
+
+        <div class="small-logo">
+            PokéLinks
+        </div>
+
+        <div class="top-actions">
+
+            <button
+                class="top-btn"
+                onclick="shuffleBoard()"
+            >
+                Embaralhar
+            </button>
+
+            <button
+                class="top-btn"
+                onclick="backToMenu()"
+            >
+                Menu
+            </button>
+
+        </div>
+    </div>
+
+    <div class="info-bar">
+
+        <div class="info-left">
+
+            <div class="info-item">
+                Dificuldade:
+                <strong id="gameDifficulty">
+                    Fácil
+                </strong>
+            </div>
+
+            <div class="info-item">
+                Erros:
+                <strong id="mistakes">
+                    0/5
+                </strong>
+            </div>
+
+        </div>
+
+        <div
+            class="info-item"
+            id="timer"
+        >
+            Sem limite de tempo
+        </div>
+
+    </div>
+
+    <div id="solved" class="solved"></div>
+
+    <div id="board" class="board"></div>
+
+    <div class="controls">
+
+        <button
+            class="control-btn"
+            onclick="checkSelection()"
+        >
+            Conferir
+        </button>
+
+        <button
+            class="control-btn secondary"
+            onclick="shuffleBoard()"
+        >
+            Embaralhar
+        </button>
+
+        <button
+            class="control-btn secondary"
+            id="hintButton"
+            onclick="giveHint()"
+        >
+            Dica
+        </button>
+
+        <button
+            class="control-btn secondary"
+            onclick="newGame()"
+        >
+            Novo jogo
+        </button>
+
+    </div>
+
+    <div
+        class="hint-box"
+        id="hintBox"
+    >
+        Encontre 4 Pokémon que tenham uma característica em comum.
+    </div>
+
+</div>
+</section>
+
+<div
+    class="message"
+    id="message"
+></div>
+
+<script>
+/* =========================================================
+   CONFIGURAÇÕES
+========================================================= */
+
+const DAILY_KEY="pokelinks_daily_v5";
+const SETTINGS_KEY="pokelinks_settings_v5";
+const MAX_MISTAKES=5;
+
+let difficulty="easy";
+let groups=[];
+let boardPokemon=[];
+let selected=[];
+let solvedGroups=[];
+let mistakes=0;
+let hintLevel=0;
+let timerInterval=null;
+let remainingSeconds=0;
+let gameActive=false;
+
+const settings={
+    darkMode:true,
+    showNumbers:false,
+    showTypes:false,
+    timerDuration:0
+};
+
+const TYPE_PT={
+    normal:"Normal",
+    fire:"Fogo",
+    water:"Água",
+    electric:"Elétrico",
+    grass:"Planta",
+    ice:"Gelo",
+    fighting:"Lutador",
+    poison:"Veneno",
+    ground:"Terrestre",
+    flying:"Voador",
+    psychic:"Psíquico",
+    bug:"Inseto",
+    rock:"Pedra",
+    ghost:"Fantasma",
+    dragon:"Dragão",
+    dark:"Sombrio",
+    steel:"Aço",
+    fairy:"Fada"
+};
+
+const NAMES={
+1:"Bulbasaur",2:"Ivysaur",3:"Venusaur",
+4:"Charmander",5:"Charmeleon",6:"Charizard",
+7:"Squirtle",8:"Wartortle",9:"Blastoise",
+10:"Caterpie",11:"Metapod",12:"Butterfree",
+13:"Weedle",14:"Kakuna",15:"Beedrill",
+16:"Pidgey",17:"Pidgeotto",18:"Pidgeot",
+19:"Rattata",20:"Raticate",
+21:"Spearow",22:"Fearow",
+23:"Ekans",24:"Arbok",
+25:"Pikachu",26:"Raichu",
+27:"Sandshrew",28:"Sandslash",
+29:"Nidoran♀",30:"Nidorina",31:"Nidoqueen",
+32:"Nidoran♂",33:"Nidorino",34:"Nidoking",
+35:"Clefairy",36:"Clefable",
+37:"Vulpix",38:"Ninetales",
+39:"Jigglypuff",40:"Wigglytuff",
+41:"Zubat",42:"Golbat",
+43:"Oddish",44:"Gloom",45:"Vileplume",
+46:"Paras",47:"Parasect",
+48:"Venonat",49:"Venomoth",
+50:"Diglett",51:"Dugtrio",
+52:"Meowth",53:"Persian",
+54:"Psyduck",55:"Golduck",
+56:"Mankey",57:"Primeape",
+58:"Growlithe",59:"Arcanine",
+60:"Poliwag",61:"Poliwhirl",62:"Poliwrath",
+63:"Abra",64:"Kadabra",65:"Alakazam",
+66:"Machop",67:"Machoke",68:"Machamp",
+69:"Bellsprout",70:"Weepinbell",71:"Victreebel",
+72:"Tentacool",73:"Tentacruel",
+74:"Geodude",75:"Graveler",76:"Golem",
+77:"Ponyta",78:"Rapidash",
+79:"Slowpoke",80:"Slowbro",
+81:"Magnemite",82:"Magneton",
+83:"Farfetch'd",
+84:"Doduo",85:"Dodrio",
+86:"Seel",87:"Dewgong",
+88:"Grimer",89:"Muk",
+90:"Shellder",91:"Cloyster",
+92:"Gastly",93:"Haunter",94:"Gengar",
+95:"Onix",
+96:"Drowzee",97:"Hypno",
+98:"Krabby",99:"Kingler",
+100:"Voltorb",101:"Electrode",
+102:"Exeggcute",103:"Exeggutor",
+104:"Cubone",105:"Marowak",
+106:"Hitmonlee",107:"Hitmonchan",
+108:"Lickitung",
+109:"Koffing",110:"Weezing",
+111:"Rhyhorn",112:"Rhydon",
+113:"Chansey",
+114:"Tangela",
+115:"Kangaskhan",
+116:"Horsea",117:"Seadra",
+118:"Goldeen",119:"Seaking",
+120:"Staryu",121:"Starmie",
+122:"Mr. Mime",
+123:"Scyther",
+124:"Jynx",
+125:"Electabuzz",
+126:"Magmar",
+127:"Pinsir",
+128:"Tauros",
+129:"Magikarp",130:"Gyarados",
+131:"Lapras",
+132:"Ditto",
+133:"Eevee",134:"Vaporeon",135:"Jolteon",136:"Flareon",
+137:"Porygon",
+138:"Omanyte",139:"Omastar",
+140:"Kabuto",141:"Kabutops",
+142:"Aerodactyl",
+143:"Snorlax",
+144:"Articuno",145:"Zapdos",146:"Moltres",
+147:"Dratini",148:"Dragonair",149:"Dragonite",
+150:"Mewtwo",151:"Mew"
+};
+
+/* =========================================================
+   TEMAS
+========================================================= */
+
+const THEMES={
+
+easy:[
+["Pokémon elétricos",[25,26,81,82]],
+["Pokémon de fogo",[4,5,37,58]],
+["Pokémon aquáticos",[7,54,118,129]],
+["Pokémon caninos",[58,59,133,136]],
+["Pokémon felinos",[52,53,37,38]],
+["Pokémon aves",[16,17,18,21]],
+["Pokémon rochosos",[74,75,76,95]],
+["Pokémon venenosos",[23,24,88,89]],
+["Pokémon insetos",[10,11,12,13]],
+["Pokémon lutadores",[56,57,66,68]],
+["Pokémon fantasmas",[92,93,94,109]],
+["Pokémon psíquicos",[63,64,65,150]],
+["Pokémon dragões",[147,148,149,130]],
+["Pokémon associados ao sono",[79,96,97,143]]
+],
+
+medium:[
+["Pokémon elétricos",[25,26,81,82]],
+["Pokémon de fogo",[4,5,37,58]],
+["Pokémon aquáticos",[7,54,118,129]],
+["Pokémon fósseis",[138,139,140,141]],
+["Pokémon rochosos",[74,75,76,95]],
+["Pokémon venenosos",[23,24,88,89]],
+["Pokémon insetos",[10,11,12,13]],
+["Pokémon lutadores",[56,57,66,68]],
+["Pokémon fantasmas",[92,93,94,109]],
+["Pokémon psíquicos",[63,64,65,150]],
+["Pokémon dragões",[147,148,149,130]],
+["Pokémon associados ao sono",[79,96,97,143]],
+["Pokémon muito grandes",[3,6,9,143]],
+["Pokémon associados ao oceano",[72,73,116,131]],
+["Pokémon associados a cavernas",[41,42,74,95]]
+],
+
+hard:[
+["Pokémon com tipo Voador",[12,18,22,142]],
+["Pokémon com tipo Sombrio",[52,53,94,130]],
+["Pokémon com tipo Aço",[81,82,95,125]],
+["Pokémon com tipo Gelo",[87,124,131,144]],
+["Pokémon com tipo Pedra",[74,75,76,95]],
+["Pokémon com tipo Terra",[27,28,50,51]],
+["Pokémon com tipo Fantasma",[92,93,94,109]],
+["Pokémon com tipo Dragão",[147,148,149,130]],
+["Pokémon associados ao oceano",[72,73,116,131]],
+["Pokémon associados a cavernas",[41,42,74,95]],
+["Pokémon associados a eletricidade",[25,26,81,82]],
+["Pokémon associados a tecnologia",[81,82,100,137]],
+["Pokémon associados a florestas",[43,46,114,123]],
+["Pokémon associados a desertos",[27,28,50,51]],
+["Pokémon associados a vulcões",[4,6,126,146]],
+["Pokémon com aparência de dragão",[130,147,148,149]]
+],
+
+impossible:[
+["Pokémon cujo nome contém a letra Y",[59,65,69,129]],
+["Pokémon cujo nome contém a letra X",[6,94,102,132]],
+["Pokémon cujo nome contém a letra J",[37,39,90,121]],
+["Pokémon cujo nome contém a letra K",[52,54,95,98]],
+["Pokémon cujo nome contém a letra M",[52,56,66,129]],
+["Pokémon cujo nome contém a letra Z",[41,42,122,145]],
+["Pokémon associados à noite",[41,42,92,94]],
+["Pokémon associados ao dia",[37,38,81,145]],
+["Pokémon que podem parecer objetos",[81,100,101,137]],
+["Pokémon com aparência de doces",[35,36,39,40]],
+["Pokémon com aparência de plantas",[1,43,44,45]],
+["Pokémon com aparência de répteis",[4,23,24,27]],
+["Pokémon com aparência de mamíferos",[19,52,58,128]],
+["Pokémon relacionados a artes marciais",[56,57,66,68]],
+["Pokémon com aparência de monstros marinhos",[73,130,131,134]],
+["Pokémon lendários de Kanto",[144,145,146,150]]
+]
+};
+
+/* =========================================================
+   FUNÇÕES AUXILIARES
+========================================================= */
+
+function hashString(str){
+    let hash=2166136261;
+
+    for(let i=0;i<str.length;i++){
+        hash^=str.charCodeAt(i);
+        hash=Math.imul(hash,16777619);
+    }
+
+    return hash>>>0;
+}
+
+function seededRandom(seed){
+    let x=seed>>>0;
+
+    return function(){
+        x+=0x6D2B79F5;
+
+        let t=x;
+        t=Math.imul(t^t>>>15,t|1);
+        t^=t+Math.imul(t^t>>>7,t|61);
+
+        return((t^t>>>14)>>>0)/4294967296;
+    };
+}
+
+function shuffleArray(array,random=Math.random){
+    const result=[...array];
+
+    for(let i=result.length-1;i>0;i--){
+        const j=Math.floor(random()*(i+1));
+        [result[i],result[j]]=[result[j],result[i]];
+    }
+
+    return result;
+}
+
+function getToday(){
+    const d=new Date();
+
+    return `${d.getFullYear()}-`+
+        `${String(d.getMonth()+1).padStart(2,"0")}-`+
+        `${String(d.getDate()).padStart(2,"0")}`;
+}
+
+function getDailyData(){
+    try{
+        return JSON.parse(
+            localStorage.getItem(DAILY_KEY)
+        )||{};
+    }catch{
+        return {};
+    }
+}
+
+function saveDailyData(data){
+    localStorage.setItem(
+        DAILY_KEY,
+        JSON.stringify(data)
+    );
+}
+
+/* =========================================================
+   STATUS DIÁRIO
+========================================================= */
+
+function getStatus(level){
+    const data=getDailyData();
+    return data[getToday()]?.[level]||null;
+}
+
+function isCompleted(level){
+    return getStatus(level)==="completed";
+}
+
+function isFailed(level){
+    return getStatus(level)==="failed";
+}
+
+/*
+   Agora perder também bloqueia a dificuldade pelo resto
+   do dia. Não é possível jogar novamente.
+*/
+function setDifficultyStatus(level,status){
+
+    const data=getDailyData();
+
+    if(!data[getToday()]){
+        data[getToday()]={};
+    }
+
+    data[getToday()][level]=status;
+
+    saveDailyData(data);
+}
+
+/* =========================================================
+   ESCOLHER GRUPOS
+========================================================= */
+
+function chooseGroups(level){
+
+    const themes=THEMES[level];
+
+    const seed=hashString(
+        "pokelinks-"+getToday()+"-"+level
+    );
+
+    const random=seededRandom(seed);
+
+    const valid=themes.filter(
+        theme=>theme[1].every(id=>NAMES[id])
+    );
+
+    const shuffled=shuffleArray(valid,random);
+
+    function find(start,chosen,used){
+
+        if(chosen.length===4){
+            return chosen;
+        }
+
+        for(let i=start;i<shuffled.length;i++){
+
+            const ids=shuffled[i][1];
+
+            if(ids.some(id=>used.has(id))){
+                continue;
+            }
+
+            const next=new Set(used);
+
+            ids.forEach(id=>next.add(id));
+
+            const result=find(
+                i+1,
+                [...chosen,shuffled[i]],
+                next
+            );
+
+            if(result){
+                return result;
+            }
+        }
+
+        return null;
+    }
+
+    let result=find(0,[],new Set());
+
+    if(!result){
+        result=[
+            ["Pokémon elétricos",[25,26,81,82]],
+            ["Pokémon aquáticos",[7,54,118,129]],
+            ["Pokémon de fogo",[4,5,37,58]],
+            ["Pokémon lutadores",[56,57,66,68]]
+        ];
+    }
+
+    return result.map((group,index)=>({
+        id:index,
+        name:group[0],
+        ids:group[1]
+    }));
+}
+
+/* =========================================================
+   API
+========================================================= */
+
+async function getPokemonData(id){
+
+    try{
+
+        const response=await fetch(
+            `https://pokeapi.co/api/v2/pokemon/${id}`
+        );
+
+        if(!response.ok){
+            throw new Error();
+        }
+
+        const data=await response.json();
+
+        return{
+            id,
+            name:NAMES[id],
+            image:
+                data.sprites.other?.["official-artwork"]?.front_default||
+                data.sprites.front_default,
+            types:data.types.map(
+                type=>type.type.name
+            )
+        };
+
+    }catch{
+
+        return{
+            id,
+            name:NAMES[id],
+            image:
+                `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`,
+            types:[]
+        };
+    }
+}
+
+/* =========================================================
+   CONFIGURAÇÕES
+========================================================= */
+
+function loadSettings(){
+
+    try{
+
+        const saved=JSON.parse(
+            localStorage.getItem(SETTINGS_KEY)
+        );
+
+        if(saved){
+            Object.assign(settings,saved);
+        }
+
+    }catch{}
+
+    document.getElementById("darkMode").checked=
+        settings.darkMode;
+
+    document.getElementById("showTypes").checked=
+        settings.showTypes;
+
+    document.getElementById("showNumbers").checked=
+        settings.showNumbers;
+
+    document.getElementById("timerDuration").value=
+        settings.timerDuration;
+
+    applyTheme();
+}
+
+function saveHomeSettings(){
+
+    settings.showTypes=
+        document.getElementById("showTypes").checked;
+
+    settings.showNumbers=
+        document.getElementById("showNumbers").checked;
+
+    settings.timerDuration=
+        Number(
+            document.getElementById("timerDuration").value
+        );
+
+    localStorage.setItem(
+        SETTINGS_KEY,
+        JSON.stringify(settings)
+    );
+}
+
+function toggleDarkMode(){
+
+    settings.darkMode=
+        document.getElementById("darkMode").checked;
+
+    localStorage.setItem(
+        SETTINGS_KEY,
+        JSON.stringify(settings)
+    );
+
+    applyTheme();
+}
+
+function applyTheme(){
+
+    document.body.classList.toggle(
+        "dark",
+        settings.darkMode
+    );
+}
+
+/* =========================================================
+   MENU
+========================================================= */
+
+function selectDifficulty(level){
+
+    if(isCompleted(level)||isFailed(level)){
+
+        showMessage(
+            "Essa dificuldade já foi encerrada hoje."
+        );
+
+        return;
+    }
+
+    difficulty=level;
+
+    updateMenu();
+}
+
+function updateMenu(){
+
+    const names={
+        easy:"Fácil",
+        medium:"Médio",
+        hard:"Difícil",
+        impossible:"Impossível"
+    };
+
+    document.querySelectorAll(".diff-btn")
+        .forEach(button=>{
+
+            const level=button.dataset.difficulty;
+            const status=getStatus(level);
+
+            button.disabled=Boolean(status);
+
+            button.classList.remove(
+                "completed",
+                "failed",
+                "selected"
+            );
+
+            if(status==="completed"){
+
+                button.classList.add("completed");
+                button.textContent=
+                    `${names[level]} ✓`;
+
+            }else if(status==="failed"){
+
+                button.classList.add("failed");
+                button.textContent=
+                    `${names[level]} ✕`;
+
+            }else{
+
+                button.textContent=names[level];
+
+                if(level===difficulty){
+                    button.classList.add("selected");
+                }
+            }
+        });
+
+    const levels=[
+        "easy",
+        "medium",
+        "hard",
+        "impossible"
+    ];
+
+    const finished=levels.filter(
+        level=>Boolean(getStatus(level))
+    ).length;
+
+    document.getElementById("dailyStatus")
+        .textContent=
+        `${finished}/4 dificuldades encerradas hoje.`;
+
+    const allDone=finished===4;
+
+    const startButton=
+        document.getElementById("startButton");
+
+    startButton.disabled=
+        allDone||
+        Boolean(getStatus(difficulty));
+
+    startButton.textContent=
+        allDone
+        ? "TODOS OS DESAFIOS ENCERRADOS"
+        : "INICIAR DESAFIO";
+}
+
+/* =========================================================
+   INICIAR
+========================================================= */
+
+async function startGame(){
+
+    if(getStatus(difficulty)){
+
+        showMessage(
+            "Essa dificuldade já foi encerrada hoje."
+        );
+
+        return;
+    }
+
+    gameActive=true;
+    mistakes=0;
+    selected=[];
+    solvedGroups=[];
+    hintLevel=0;
+
+    document.getElementById("menu")
+        .classList.add("hidden");
+
+    document.getElementById("game")
+        .classList.remove("hidden");
+
+    const names={
+        easy:"Fácil",
+        medium:"Médio",
+        hard:"Difícil",
+        impossible:"Impossível"
+    };
+
+    document.getElementById("gameDifficulty")
+        .textContent=names[difficulty];
+
+    document.getElementById("mistakes")
+        .textContent=`0/${MAX_MISTAKES}`;
+
+    document.getElementById("hintBox")
+        .textContent=
+        "Encontre 4 Pokémon que tenham uma característica em comum.";
+
+    groups=chooseGroups(difficulty);
+
+    const ids=[
+        ...new Set(
+            groups.flatMap(
+                group=>group.ids
+            )
+        )
+    ];
+
+    const data=await Promise.all(
+        ids.map(getPokemonData)
+    );
+
+    boardPokemon=shuffleArray(data);
+
+    renderSolved();
+    renderBoard();
+    startTimer();
+}
+
+/* =========================================================
+   RENDER TABULEIRO
+========================================================= */
+
+function renderBoard(){
+
+    const board=
+        document.getElementById("board");
+
+    board.innerHTML="";
+
+    const solvedIds=new Set(
+        solvedGroups.flatMap(
+            group=>group.ids
+        )
+    );
+
+    const visible=boardPokemon.filter(
+        pokemon=>!solvedIds.has(pokemon.id)
+    );
+
+    visible.forEach(pokemon=>{
+
+        const card=document.createElement("button");
+
+        card.type="button";
+        card.className="pokemon-card";
+        card.dataset.id=pokemon.id;
+
+        if(selected.includes(pokemon.id)){
+            card.classList.add("selected");
+        }
+
+        let html=`
+            <img
+                src="${pokemon.image}"
+                alt="${pokemon.name}"
+            >
+
+            <div class="pokemon-name">
+                ${pokemon.name}
+            </div>
+        `;
+
+        if(settings.showNumbers){
+
+            html+=`
+                <div class="pokemon-number">
+                    #${String(pokemon.id).padStart(3,"0")}
+                </div>
+            `;
+        }
+
+        if(settings.showTypes){
+
+            html+=`
+                <div class="type-list">
+                    ${pokemon.types.map(type=>`
+                        <span class="type type-${type}">
+                            ${TYPE_PT[type]||type}
+                        </span>
+                    `).join("")}
+                </div>
+            `;
+        }
+
+        card.innerHTML=html;
+
+        card.addEventListener(
+            "click",
+            ()=>togglePokemon(pokemon.id,card)
+        );
+
+        board.appendChild(card);
+    });
+}
+
+/* =========================================================
+   CLIQUE NO POKÉMON
+   NÃO REFAZ O TABULEIRO.
+   ASSIM, SOMENTE O CARD CLICADO ANIMA.
+========================================================= */
+
+function togglePokemon(id,card){
+
+    if(!gameActive){
+        return;
+    }
+
+    /* Anima somente o card clicado */
+    card.classList.remove("clicked-animation");
+
+    void card.offsetWidth;
+
+    card.classList.add("clicked-animation");
+
+    setTimeout(()=>{
+        card.classList.remove("clicked-animation");
+    },350);
+
+    if(selected.includes(id)){
+
+        selected=selected.filter(
+            selectedId=>selectedId!==id
+        );
+
+        card.classList.remove("selected");
+
+    }else{
+
+        if(selected.length>=4){
+
+            showMessage(
+                "Você já escolheu 4 Pokémon."
+            );
+
+            return;
+        }
+
+        selected.push(id);
+
+        card.classList.add("selected");
+    }
+}
+
+/* =========================================================
+   PISCAR DICA
+========================================================= */
+
+function flashHintButton(){
+
+    const button=
+        document.getElementById("hintButton");
+
+    button.classList.remove("hint-attention");
+
+    void button.offsetWidth;
+
+    button.classList.add("hint-attention");
+
+    setTimeout(()=>{
+        button.classList.remove("hint-attention");
+    },3500);
+}
+
+/* =========================================================
+   CONFERIR
+========================================================= */
+
+function checkSelection(){
+
+    if(!gameActive){
+        return;
+    }
+
+    if(selected.length!==4){
+
+        showMessage(
+            "Escolha exatamente 4 Pokémon."
+        );
+
+        return;
+    }
+
+    const group=groups.find(
+        group=>group.ids.every(
+            id=>selected.includes(id)
+        )
+    );
+
+    if(group){
+
+        solvedGroups.push(group);
+
+        selected=[];
+
+        hintLevel=0;
+
+        renderSolved();
+        renderBoard();
+
+        /*
+           Mostra a janela com as imagens dos quatro
+           Pokémon antes de continuar.
+        */
+        showGroupWindow(group);
+
+    }else{
+
+        mistakes++;
+
+        document.getElementById("mistakes")
+            .textContent=
+            `${mistakes}/${MAX_MISTAKES}`;
+
+        selected=[];
+
+        renderBoard();
+
+        /*
+           Ao errar, chama atenção para a Dica.
+        */
+        flashHintButton();
+
+        showMessage(
+            mistakes>=MAX_MISTAKES
+            ? "Você atingiu o limite de erros!"
+            : "Esses Pokémon não formam um grupo."
+        );
+
+        if(mistakes>=MAX_MISTAKES){
+
+            /*
+               Perdeu = dificuldade bloqueada até o próximo dia.
+            */
+            gameActive=false;
+
+            clearInterval(timerInterval);
+
+            setDifficultyStatus(
+                difficulty,
+                "failed"
+            );
+
+            setTimeout(()=>{
+                showResultWindow(false);
+            },500);
+        }
+    }
+}
+
+/* =========================================================
+   JANELA DO GRUPO ACERTADO
+========================================================= */
+
+function showGroupWindow(group){
+
+    const modal=document.createElement("div");
+
+    modal.className="group-modal";
+    modal.id="groupModal";
+
+    const pokemonData=group.ids.map(
+        id=>boardPokemon.find(
+            pokemon=>pokemon.id===id
+        )
+    ).filter(Boolean);
+
+    modal.innerHTML=`
+        <div class="group-window">
+
+            <div class="group-header">
+
+                <div class="group-check">
+                    ✓
+                </div>
+
+                <h2>
+                    Grupo encontrado!
+                </h2>
+
+                <p>
+                    ${group.name}
+                </p>
+
+            </div>
+
+            <div class="group-pokemon-grid">
+
+                ${pokemonData.map((pokemon,index)=>`
+
+                    <div
+                        class="group-pokemon"
+                        style="animation-delay:${index*80}ms"
+                    >
+
+                        <img
+                            src="${pokemon.image}"
+                            alt="${pokemon.name}"
+                        >
+
+                        <div class="group-pokemon-name">
+                            ${pokemon.name}
+                        </div>
+
+                        ${
+                            settings.showNumbers
+                            ? `
+                                <div class="group-pokemon-number">
+                                    #${String(pokemon.id).padStart(3,"0")}
+                                </div>
+                            `
+                            : ""
+                        }
+
+                        ${
+                            settings.showTypes
+                            ? `
+                                <div class="type-list">
+                                    ${pokemon.types.map(type=>`
+                                        <span class="type type-${type}">
+                                            ${TYPE_PT[type]||type}
+                                        </span>
+                                    `).join("")}
+                                </div>
+                            `
+                            : ""
+                        }
+
+                    </div>
+
+                `).join("")}
+
+            </div>
+
+            <button
+                class="group-continue"
+                onclick="closeGroupWindow()"
+            >
+                CONTINUAR
+            </button>
+
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+}
+
+function closeGroupWindow(){
+
+    const modal=
+        document.getElementById("groupModal");
+
+    if(modal){
+        modal.remove();
+    }
+
+    if(solvedGroups.length===4){
+
+        finishGame();
+
+    }else{
+
+        showMessage(
+            "Continue procurando os próximos grupos!"
+        );
+    }
+}
+
+/* =========================================================
+   GRUPOS RESOLVIDOS
+========================================================= */
+
+function renderSolved(){
+
+    const container=
+        document.getElementById("solved");
+
+    container.innerHTML="";
+
+    solvedGroups.forEach(group=>{
+
+        const box=document.createElement("div");
+
+        box.className="solved-group";
+
+        box.innerHTML=`
+            <div class="solved-title">
+                ${group.name}
+            </div>
+
+            <div class="solved-pokemon">
+                ${group.ids
+                    .map(id=>NAMES[id])
+                    .join(" · ")
+                }
+            </div>
+        `;
+
+        container.appendChild(box);
+    });
+}
+
+/* =========================================================
+   EMBARALHAR
+========================================================= */
+
+function shuffleBoard(){
+
+    if(!gameActive){
+        return;
+    }
+
+    boardPokemon=
+        shuffleArray(boardPokemon);
+
+    selected=[];
+
+    renderBoard();
+
+    showMessage(
+        "Pokémon embaralhados."
+    );
+}
+
+/* =========================================================
+   DICAS
+========================================================= */
+
+function giveHint(){
+
+    if(!gameActive){
+        return;
+    }
+
+    const button=
+        document.getElementById("hintButton");
+
+    button.classList.remove("hint-attention");
+
+    const unsolved=
+        groups.filter(
+            group=>!solvedGroups.includes(group)
+        );
+
+    if(!unsolved.length){
+        return;
+    }
+
+    const group=unsolved[0];
+
+    hintLevel++;
+
+    if(hintLevel===1){
+
+        document.getElementById("hintBox")
+            .textContent=
+            `Dica: procure uma conexão relacionada a "${group.name}".`;
+
+    }else if(hintLevel===2){
+
+        document.getElementById("hintBox")
+            .textContent=
+            `Dica: ${NAMES[group.ids[0]]} faz parte desse grupo.`;
+
+    }else if(hintLevel===3){
+
+        document.getElementById("hintBox")
+            .textContent=
+            `Dica: dois deles são ${NAMES[group.ids[0]]} e ${NAMES[group.ids[1]]}.`;
+
+    }else{
+
+        document.getElementById("hintBox")
+            .textContent=
+            `Dica final: ${group.ids
+                .map(id=>NAMES[id])
+                .join(", ")}.`;
+
+        hintLevel=0;
+    }
+}
+
+/* =========================================================
+   NOVO JOGO
+========================================================= */
+
+async function newGame(){
+
+    /*
+       Se a pessoa perdeu ou ganhou, não pode iniciar
+       outro jogo daquela dificuldade.
+    */
+    if(!gameActive){
+        return;
+    }
+
+    clearInterval(timerInterval);
+
+    mistakes=0;
+    selected=[];
+    solvedGroups=[];
+    hintLevel=0;
+
+    document.getElementById("mistakes")
+        .textContent=`0/${MAX_MISTAKES}`;
+
+    document.getElementById("hintBox")
+        .textContent=
+        "Encontre 4 Pokémon que tenham uma característica em comum.";
+
+    groups=chooseGroups(difficulty);
+
+    const ids=[
+        ...new Set(
+            groups.flatMap(
+                group=>group.ids
+            )
+        )
+    ];
+
+    const data=await Promise.all(
+        ids.map(getPokemonData)
+    );
+
+    boardPokemon=shuffleArray(data);
+
+    renderSolved();
+    renderBoard();
+    startTimer();
+}
+
+/* =========================================================
+   RESULTADO
+========================================================= */
+
+function showResultWindow(won){
+
+    const modal=document.createElement("div");
+
+    modal.className="result-modal";
+    modal.id="resultModal";
+
+    if(won){
+
+        modal.innerHTML=`
+            <div class="result-window">
+
+                <div class="result-icon">🏆</div>
+
+                <h2>
+                    Desafio concluído!
+                </h2>
+
+                <p>
+                    Você encontrou todos os 4 grupos.
+                    Esta dificuldade ficará concluída
+                    até o próximo dia.
+                </p>
+
+                <button
+                    class="result-button"
+                    onclick="closeResultWindow()"
+                >
+                    VOLTAR AO MENU
+                </button>
+
+            </div>
+        `;
+
+    }else{
+
+        modal.innerHTML=`
+            <div class="result-window">
+
+                <div class="result-icon">✕</div>
+
+                <h2>
+                    Fim de jogo
+                </h2>
+
+                <p>
+                    Você atingiu o limite de 5 erros.
+                    Esta dificuldade foi encerrada
+                    e não poderá ser refeita até amanhã.
+                </p>
+
+                <button
+                    class="result-button"
+                    onclick="closeResultWindow()"
+                >
+                    VOLTAR AO MENU
+                </button>
+
+            </div>
+        `;
+    }
+
+    document.body.appendChild(modal);
+}
+
+function closeResultWindow(){
+
+    const modal=
+        document.getElementById("resultModal");
+
+    if(modal){
+        modal.remove();
+    }
+
+    backToMenu();
+}
+
+/* =========================================================
+   FINAL DO JOGO
+========================================================= */
+
+function finishGame(){
+
+    if(solvedGroups.length!==4){
+        return;
+    }
+
+    gameActive=false;
+
+    clearInterval(timerInterval);
+
+    setDifficultyStatus(
+        difficulty,
+        "completed"
+    );
+
+    setTimeout(()=>{
+        showResultWindow(true);
+    },400);
+}
+
+function endGameByTime(){
+
+    gameActive=false;
+
+    clearInterval(timerInterval);
+
+    setDifficultyStatus(
+        difficulty,
+        "failed"
+    );
+
+    showMessage(
+        "O tempo acabou!"
+    );
+
+    setTimeout(()=>{
+        showResultWindow(false);
+    },500);
+}
+
+/* =========================================================
+   TIMER
+========================================================= */
+
+function startTimer(){
+
+    clearInterval(timerInterval);
+
+    if(!settings.timerDuration){
+
+        document.getElementById("timer")
+            .textContent=
+            "Sem limite de tempo";
+
+        return;
+    }
+
+    remainingSeconds=
+        settings.timerDuration;
+
+    updateTimerText();
+
+    timerInterval=setInterval(()=>{
+
+        remainingSeconds--;
+
+        updateTimerText();
+
+        if(remainingSeconds<=0){
+            endGameByTime();
+        }
+
+    },1000);
+}
+
+function updateTimerText(){
+
+    const minutes=
+        Math.floor(
+            remainingSeconds/60
+        )
+        .toString()
+        .padStart(2,"0");
+
+    const seconds=
+        (remainingSeconds%60)
+        .toString()
+        .padStart(2,"0");
+
+    document.getElementById("timer")
+        .textContent=
+        `${minutes}:${seconds}`;
+}
+
+/* =========================================================
+   VOLTAR AO MENU
+========================================================= */
+
+function backToMenu(){
+
+    gameActive=false;
+
+    clearInterval(timerInterval);
+
+    document.getElementById("game")
+        .classList.add("hidden");
+
+    document.getElementById("menu")
+        .classList.remove("hidden");
+
+    selected=[];
+    solvedGroups=[];
+    mistakes=0;
+
+    updateMenu();
+}
+
+/* =========================================================
+   CONTAGEM ATÉ MEIA-NOITE
+========================================================= */
+
+function updateCountdown(){
+
+    const now=new Date();
+
+    const next=new Date(now);
+
+    next.setHours(24,0,0,0);
+
+    const diff=Math.max(
+        0,
+        next-now
+    );
+
+    const hours=Math.floor(
+        diff/3600000
+    );
+
+    const minutes=Math.floor(
+        (diff%3600000)/60000
+    );
+
+    const seconds=Math.floor(
+        (diff%60000)/1000
+    );
+
+    document.getElementById("countdown")
+        .textContent=
+        `${String(hours).padStart(2,"0")}:`+
+        `${String(minutes).padStart(2,"0")}:`+
+        `${String(seconds).padStart(2,"0")}`;
+
+    updateMenu();
+}
+
+/* =========================================================
+   MENSAGENS
+========================================================= */
+
+let messageTimeout;
+
+function showMessage(text){
+
+    const message=
+        document.getElementById("message");
+
+    message.textContent=text;
+
+    message.classList.add("show");
+
+    clearTimeout(messageTimeout);
+
+    messageTimeout=setTimeout(()=>{
+        message.classList.remove("show");
+    },1800);
+}
+
+/* =========================================================
+   INICIALIZAÇÃO
+========================================================= */
+
+loadSettings();
+updateMenu();
+updateCountdown();
+
+setInterval(
+    updateCountdown,
+    1000
+);
+</script>
+
+</body>
+</html>
